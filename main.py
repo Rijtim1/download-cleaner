@@ -6,14 +6,18 @@ DOWNLOADS_PATH = r"C:\Users\rijan\Downloads"
 
 
 def get_file_names(path=DOWNLOADS_PATH):
-    f = []
-    for (dirpath, dirnames, filenames) in walk(DOWNLOADS_PATH):
-        f.extend(filenames)
+    """This function adds all the files in a set directory to a list."""
+    file_names = []
+    for (dirpath, dirnames, filenames) in walk(path):
+        file_names.extend(filenames)
         break
-    return f
+    return file_names
 
 
 def find_keys(file_names):
+    """This function looks at each of the files in the list the function above creates,
+            and stores the file extension on a list. This will later be used to create
+            the dir where the respective files will move to."""
     keys = []
     for items in file_names:
         if items[-3:] in keys:
@@ -23,16 +27,8 @@ def find_keys(file_names):
     return keys
 
 
-def find_values(file_names, keys):
-    values = []
-    for i in range(len(keys)):
-        for items in file_names:
-            if keys[i] in items:
-                values.append(items)
-    return values
-
-
 def create_dir(keys):
+    """This function creats the a new directory for each file extension type."""
     for key in keys:
         path = r"C:\Users\rijan\Downloads" + r"/" + key
         try:
@@ -44,6 +40,7 @@ def create_dir(keys):
 
 
 def move_to_dirs(keys, values):
+    """This function moves the files into their respective directory."""
     for i in range(len(keys)):
         for j in range(len(values)):
             if keys[i] in values[j]:
@@ -58,6 +55,6 @@ def move_to_dirs(keys, values):
 if __name__ == '__main__':
     file_names = get_file_names(DOWNLOADS_PATH)
     keys = find_keys(file_names)
-    values = find_values(file_names, keys)
+    # values = find_values(file_names, keys)
     create_dir(keys)
-    move_to_dirs(keys, values)
+    move_to_dirs(keys, file_names)
