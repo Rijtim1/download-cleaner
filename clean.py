@@ -56,9 +56,11 @@ def move_to_dirs(keys, values):
 if __name__ == '__main__':
     print("Getting File Names")
     file_names = get_file_names(DOWNLOADS_PATH)
+    print("{} files found in downloads folder.".format(len(file_names)))
     print("Getting Ready To Create Folders")
     keys = find_keys(file_names)
     print("Creating Folders")
+    print("{} new folders created".format(len(keys)))
     create_dir(keys)
     print("Moving!!!!")
     move_to_dirs(keys, file_names)
