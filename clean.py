@@ -1,6 +1,7 @@
 import os
 from os import walk
 import shutil
+import time
 
 DOWNLOADS_PATH = r"C:\Users\rijan\Downloads"
 
@@ -54,6 +55,7 @@ def move_to_dirs(keys, values):
 
 
 if __name__ == '__main__':
+    start = time.time()
     print("Getting File Names")
     file_names = get_file_names(DOWNLOADS_PATH)
     print("{} files found in downloads folder.".format(len(file_names)))
@@ -64,3 +66,5 @@ if __name__ == '__main__':
     create_dir(keys)
     print("Moving!!!!")
     move_to_dirs(keys, file_names)
+    print("Finished")
+    print("Time taken: {:.4}".format(time.time() - start))
