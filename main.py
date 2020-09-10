@@ -20,10 +20,11 @@ def find_keys(file_names):
             the dir where the respective files will move to."""
     keys = []
     for items in file_names:
-        if items[-3:] in keys:
+        dot = items.rindex(".")
+        if items[dot+1:] in keys:
             pass
         else:
-            keys.append(items[-3:])
+            keys.append(items[dot+1:])
     return keys
 
 
@@ -53,8 +54,11 @@ def move_to_dirs(keys, values):
 
 
 if __name__ == '__main__':
+    print("Getting File Names")
     file_names = get_file_names(DOWNLOADS_PATH)
+    print("Getting Ready To Create Folders")
     keys = find_keys(file_names)
-    # values = find_values(file_names, keys)
+    print("Creating Folders")
     create_dir(keys)
+    print("Moving!!!!")
     move_to_dirs(keys, file_names)
