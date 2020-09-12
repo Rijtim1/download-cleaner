@@ -32,7 +32,7 @@ def find_keys(file_names):
 def create_dir(keys):
     """This function creats the a new directory for each file extension type."""
     for key in keys:
-        path = r"C:\Users\rijan\Downloads" + r"/" + key
+        path = DOWNLOADS_PATH + r"/" + key
         try:
             os.mkdir(path)
             print('{} successfully created in {}'.format(key, path))
@@ -47,8 +47,8 @@ def move_to_dirs(keys, values):
         for j in range(len(values)):
             if keys[i] in values[j]:
                 try:
-                    shutil.move(r"C:\Users\rijan\Downloads" + r"/" + values[j],
-                                r"C:\Users\rijan\Downloads" + r"/" + keys[i])
+                    shutil.move(DOWNLOADS_PATH + r"/" + values[j],
+                                DOWNLOADS_PATH + r"/" + keys[i])
                 except Exception as e:
                     print("{} happened".format(e))
                     print("But was handeled")
@@ -67,4 +67,4 @@ if __name__ == '__main__':
     print("Moving!!!!")
     move_to_dirs(keys, file_names)
     print("Finished")
-    print("Time taken: {:.4}".format(time.time() - start))
+    print("Time taken: {:.2}".format(time.time() - start))
