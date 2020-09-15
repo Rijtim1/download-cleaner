@@ -36,7 +36,12 @@ def create_dir(keys):
         try:
             os.mkdir(path)
             print('{} successfully created in {}'.format(key, path))
+        except FileExistsError as e:
+            pass
+            print("{} occured".format(e))
+            print("Skipping!!!!")
         except Exception as e:
+            pass
             print("{} occured".format(e))
             print("But was handled properly")
 
@@ -50,8 +55,9 @@ def move_to_dirs(keys, values):
                     shutil.move(DOWNLOADS_PATH + r"/" + values[j],
                                 DOWNLOADS_PATH + r"/" + keys[i])
                 except Exception as e:
-                    print("{} happened".format(e))
-                    print("But was handeled")
+                    os.remove(DOWNLOADS_PATH + r"/" + values[j])
+                    print("{} occured.".format(e))
+                    print("The file was deleted.")
 
 
 if __name__ == '__main__':
