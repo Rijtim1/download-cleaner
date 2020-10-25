@@ -12,7 +12,7 @@ def get_file_names(path=DOWNLOADS_PATH):
     for (dirpath, dirnames, filenames) in walk(path):
         file_names.extend(filenames)
         break
-    return file_names
+    return dirnames, file_names
 
 
 def find_keys(file_names):
@@ -29,21 +29,17 @@ def find_keys(file_names):
     return keys
 
 
-def create_dir(keys):
+def create_dir(dirnames, keys):
     """This function creats the a new directory for each file extension type."""
-    for key in keys:
-        path = DOWNLOADS_PATH + r"/" + key
-        try:
-            os.mkdir(path)
-            print('{} successfully created in {}'.format(key, path))
-        except FileExistsError as e:
-            pass
-            print("{} occured".format(e))
-            print("Skipping!!!!")
-        except Exception as e:
-            pass
-            print("{} occured".format(e))
-            print("But was handled properly")
+    count = 0
+    for i in range(len(keys)):
+        if keys[i] not in dirnames:
+            path = DOWNLOADS_PATH + r"/" + keys[i]
+            os.makedirs(path)
+            count += 1
+        else:
+            print("{} is already there, skipping".format(keys[i]))
+    print("{} new folders created\n".format(count))
 
 
 def move_to_dirs(keys, values):
@@ -62,15 +58,14 @@ def move_to_dirs(keys, values):
 
 if __name__ == '__main__':
     start = time.time()
-    print("Getting File Names")
-    file_names = get_file_names(DOWNLOADS_PATH)
-    print("{} files found in downloads folder.".format(len(file_names)))
-    print("Getting Ready To Create Folders")
+    print("Getting File Names\n")
+    dirnames, file_names = get_file_names(DOWNLOADS_PATH)
+    print("{} files found in downloads folder.\n".format(len(file_names)))
+    print("Getting Ready To Create Folders\n")
     keys = find_keys(file_names)
-    print("Creating Folders")
-    print("{} new folders created".format(len(keys)))
-    create_dir(keys)
-    print("Moving!!!!")
+    print("Creating Folders\n")
+    create_dir(dirnames, keys)
+    print("Moving!!!!\n")
     move_to_dirs(keys, file_names)
-    print("Finished")
+    print("Finished\n")
     print("Time taken: {:.2}".format(time.time() - start))
