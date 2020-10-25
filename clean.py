@@ -3,6 +3,7 @@ from os import walk
 import shutil
 import time
 
+# downloads folder path
 DOWNLOADS_PATH = r"C:\Users\rijan\Downloads"
 
 
