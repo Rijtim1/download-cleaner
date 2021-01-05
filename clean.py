@@ -36,7 +36,10 @@ def create_dir(dirnames, keys):
     for i in range(len(keys)):
         if keys[i] not in dirnames:
             path = DOWNLOADS_PATH + r"/" + keys[i]
-            os.makedirs(path)
+            try:
+                os.makedirs(path)
+            except IOError:
+                pass
             count += 1
         else:
             print("{} is already there, skipping".format(keys[i]))
