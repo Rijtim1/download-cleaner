@@ -69,7 +69,7 @@ if __name__ == '__main__':
     keys = find_keys(file_names)
     print("Creating Folders\n")
     create_dir(dirnames, keys)
-    print("Moving!!!!\n")
+    print("Moving the Files\n")
     move_to_dirs(keys, file_names)
     print("Finished\n")
     print("Time taken: {:.2}".format(time.time() - start))
