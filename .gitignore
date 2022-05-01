@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 # extra unimportant files
 *.bat
+
+.vscode/
