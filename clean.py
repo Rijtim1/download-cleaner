@@ -4,7 +4,7 @@ import shutil
 import time
 
 # downloads folder path
-DOWNLOADS_PATH = r"C:\Users\rijan\Downloads"
+DOWNLOADS_PATH = r"download folder path"
 
 
 def get_file_names(path=DOWNLOADS_PATH):
@@ -59,6 +59,21 @@ def move_to_dirs(keys, values):
                     print("{} occured.".format(e))
                     print("The file was deleted.")
 
+def delete_if_older_than_a_month():
+    """This function deletes the directory if the directory date modified is older than a month"""
+    # get the date of the last month
+    last_month = time.strftime("%d-%m-%Y", time.localtime(time.time() - 60 * 60 * 24 * 30))
+    # get the list of all the directories in the downloads folder
+    dir_list = os.listdir(DOWNLOADS_PATH)
+    # iterate through the list of directories
+    for dir in dir_list:
+        # get the date of the last modified file in the directory
+        last_modified_date = time.strftime("%d-%m-%Y", time.localtime(os.path.getmtime(DOWNLOADS_PATH + r"/" + dir)))
+        # if the last modified date is older than a month, delete the directory
+        if last_modified_date < last_month:
+            shutil.rmtree(DOWNLOADS_PATH + r"/" + dir)
+            print("{} was deleted.".format(dir))
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -69,7 +84,9 @@ if __name__ == '__main__':
     keys = find_keys(file_names)
     print("Creating Folders\n")
     create_dir(dirnames, keys)
-    print("Moving the Files\n")
+    print("Moving!!!!\n")
     move_to_dirs(keys, file_names)
     print("Finished\n")
+    print("Deleting Folders if older than a month\n")
+    delete_if_older_than_a_month()
     print("Time taken: {:.2}".format(time.time() - start))

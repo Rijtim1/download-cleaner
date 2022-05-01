@@ -1,0 +1,4 @@
+@echo off
+"python path" "clean.py path"
+timeout 2 >nul
+exit
