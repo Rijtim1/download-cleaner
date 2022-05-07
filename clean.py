@@ -8,8 +8,10 @@ import config
 def get_file_names(path=config.DOWNLOAD_PATH):
     """This function adds all the files in a set directory to a list."""
     file_names = []
+    dirnames = []
     for (dirpath, dirnames, filenames) in walk(path):
         file_names.extend(filenames)
+        dirnames.extend(dirnames)
         break
     return dirnames, file_names
 
