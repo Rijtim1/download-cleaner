@@ -1,99 +1,79 @@
+from config import DOWNLOAD_PATH, DELETE_IF_OLDER_THAN_MONTHS
 import os
-from os import walk
 import shutil
 import time
-import config
 
 
-def get_file_names(path=config.DOWNLOAD_PATH):
-    """This function adds all the files in a set directory to a list."""
-    file_names = []
-    dirnames = []
-    for (dirpath, dirnames, filenames) in walk(path):
-        file_names.extend(filenames)
-        dirnames.extend(dirnames)
-        break
-    return dirnames, file_names
-
-
-def find_keys(file_names):
-    """This function looks at each of the files in the list the function above creates,
-    and stores the file extension on a list. This will later be used to create
-    the dir where the respective files will move to."""
-    keys = []
-    for items in file_names:
-        dot = items.rindex(".")
-        if items[dot + 1 :] in keys:
-            pass
-        else:
-            keys.append(items[dot + 1 :])
-    return keys
-
-
-def create_dir(dirnames, keys):
-    """This function creats the a new directory for each file extension type."""
-    count = 0
-    for i in range(len(keys)):
-        if keys[i] not in dirnames:
-            path = config.DOWNLOAD_PATH + r"/" + keys[i]
-            try:
-                os.makedirs(path)
-            except IOError:
-                pass
-            count += 1
-        else:
-            print("{} is already there, skipping".format(keys[i]))
-    print("{} new folders created\n".format(count))
-
-
-def move_to_dirs(keys, values):
-    """This function moves the files into their respective directory."""
-    for i in range(len(keys)):
-        for j in range(len(values)):
-            if keys[i] in values[j]:
-                try:
-                    shutil.move(
-                        config.DOWNLOAD_PATH + r"/" + values[j],
-                        config.DOWNLOAD_PATH + r"/" + keys[i],
-                    )
-                except Exception as e:
-                    os.remove(config.DOWNLOAD_PATH + r"/" + values[j])
-                    print("{} occured.".format(e))
-                    print("The file was deleted.")
-
-
-def delete_if_older(num_months):
-    """This function deletes the directory if the directory date modified is older than a month"""
-    last_month = time.strftime(
-        "%d-%m-%Y", time.localtime(time.time() - 60 * 60 * 24 * num_months)
-    )
-    # get the list of all the directories in the downloads folder
-    dir_list = os.listdir(config.DOWNLOAD_PATH)
-    # iterate through the list of directories
-    for dir in dir_list:
-        # get the date of the last modified file in the directory
-        last_modified_date = time.strftime(
-            "%d-%m-%Y",
-            time.localtime(os.path.getmtime(config.DOWNLOAD_PATH + r"/" + dir)),
+class Clean:
+    def __init__(self):
+        self.dirnames = []
+        self.file_names = []
+        self.keys = []
+        self.count = 0
+        self.start = time.time()
+        self.last_month = time.strftime(
+            "%d-%m-%Y", time.localtime(time.time() - 60 * 60 * 24 * DELETE_IF_OLDER_THAN_MONTHS)
         )
-        print("{} was last modified on {}".format(dir, last_modified_date))
-        if last_modified_date < last_month:
-            shutil.rmtree(config.DOWNLOAD_PATH + r"/" + dir)
-            print("{} was deleted.".format(dir))
 
+    def get_file_names(self, path):
+        """This function gets the file names in the downloads folder."""
+        for dirname, dirnames, filenames in os.walk(path):
+            self.dirnames.append(dirname)
+            self.file_names.append(filenames)
+
+    def find_keys(self):
+        """This function finds the keys in the file names."""
+        for i in range(len(self.file_names)):
+            for j in range(len(self.file_names[i])):
+                if self.file_names[i][j] not in self.keys:
+                    self.keys.append(self.file_names[i][j])
+
+    def create_dir(self, dirnames, keys):
+        """This function creates the directories."""
+        for i in range(len(keys)):
+            if keys[i] not in dirnames:
+                path = DOWNLOAD_PATH + r"/" + keys[i]
+                try:
+                    os.makedirs(path)
+                except IOError:
+                    pass
+                self.count += 1
+            else:
+                print("{} is already there, skipping".format(keys[i]))
+
+    def move_to_dirs(self, keys, values):
+        """This function moves the files to their respective directories."""
+        for i in range(len(keys)):
+            for j in range(len(values)):
+                if keys[i] in values[j]:
+                    try:
+                        shutil.move(
+                            DOWNLOAD_PATH + r"/" + values[j],
+                            DOWNLOAD_PATH + r"/" + keys[i],
+                        )
+                    except Exception as e:
+                        os.remove(DOWNLOAD_PATH + r"/" + values[j])
+                        print("{} occured.".format(e))
+                        print("The file was deleted.")
+
+    def delete_if_older(self):
+        """This function deletes the directories if the directory date modified is older than a month"""
+        for dirname in self.dirnames:
+            if os.path.getmtime(dirname) < time.mktime(
+                time.strptime(self.last_month, "%d-%m-%Y")
+            ):
+                shutil.rmtree(dirname)
+
+    def run(self):
+        """This function runs the program."""
+        self.get_file_names(DOWNLOAD_PATH)
+        self.find_keys()
+        self.create_dir(self.dirnames, self.keys)
+        self.move_to_dirs(self.keys, self.file_names)
+        self.delete_if_older()
+        print("{} directories were created.".format(self.count))
+        print("{} directories were deleted.".format(self.count))
+        print("{} seconds were taken.".format(time.time() - self.start))
 
 if __name__ == "__main__":
-    start = time.time()
-    print("Getting File Names\n")
-    dirnames, file_names = get_file_names(config.DOWNLOAD_PATH)
-    print("{} files found in downloads folder.\n".format(len(file_names)))
-    print("Getting Ready To Create Folders\n")
-    keys = find_keys(file_names)
-    print("Creating Folders\n")
-    create_dir(dirnames, keys)
-    print("Moving!!!!\n")
-    move_to_dirs(keys, file_names)
-    print("Finished\n")
-    print("Deleting Folders if older than a month\n")
-    delete_if_older(config.DELETE_IF_OLDER_THAN_MONTHS)
-    print("Time taken: {:.2}".format(time.time() - start))
+    Clean().run()
