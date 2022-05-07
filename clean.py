@@ -62,8 +62,6 @@ def move_to_dirs(keys, values):
 
 def delete_if_older(num_months):
     """This function deletes the directory if the directory date modified is older than a month"""
-    # get the date of the last month
-    # last_month = time.strftime("%d-%m-%Y", time.localtime(time.time() - 60 * 60 * 24 * 30))
     last_month = time.strftime(
         "%d-%m-%Y", time.localtime(time.time() - 60 * 60 * 24 * num_months)
     )
@@ -76,7 +74,7 @@ def delete_if_older(num_months):
             "%d-%m-%Y",
             time.localtime(os.path.getmtime(config.DOWNLOAD_PATH + r"/" + dir)),
         )
-        # if the last modified date is older than a month, delete the directory
+        print("{} was last modified on {}".format(dir, last_modified_date))
         if last_modified_date < last_month:
             shutil.rmtree(config.DOWNLOAD_PATH + r"/" + dir)
             print("{} was deleted.".format(dir))
