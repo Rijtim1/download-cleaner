@@ -131,4 +131,3 @@ dmypy.json
 *.bat
 
 .vscode/
-config.py
