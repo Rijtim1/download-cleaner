@@ -22,7 +22,8 @@ class Clean:
     def find_file_extension(self):
         """This function finds the keys in the file names."""
         for i in range(len(self.file_names)):
-            _, extension = self.file_names[i].split(".")
+            # print(self.file_names[i].split("."))
+            extension = self.file_names[i].split(".")[-1]
             if extension not in self.keys:
                 self.keys.append(extension)
         self.keys = list(set(self.keys))
@@ -42,7 +43,7 @@ class Clean:
         """This function moves the files to their respective directories."""
         count = 0
         for i in range(len(self.file_names)):
-            _, extension = self.file_names[i].split(".")
+            extension = self.file_names[i].split(".")[-1]
             if extension in self.keys:
                 try:
                     shutil.move(
