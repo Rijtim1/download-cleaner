@@ -51,7 +51,7 @@ class Clean:
                         os.path.join(self.root_dir, extension))
                     count += 1
                 except Exception as e:
-                    print(e + "deleting file...")
+                    print(str(e) + " deleting file...")
                     # delete the file
                     os.remove(os.path.join(self.root_dir, self.file_names[i]))
         print("{} files were moved.".format(count))
