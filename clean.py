@@ -1,7 +1,8 @@
-from config import DOWNLOAD_PATH
+from config import *
 import os
 import shutil
 import time
+import datetime
 
 
 class Clean:
@@ -56,12 +57,24 @@ class Clean:
                     os.remove(os.path.join(self.root_dir, self.file_names[i]))
         print("{} files were moved.".format(count))
 
+    def deletion_check(self):
+        """This function checks if the files are older than the specified number of months."""
+        last_month = datetime.datetime.now() - datetime.timedelta(days=DELETE_IF_UNUSED_AFTER)
+        count = 0
+        for i in range(len(self.dirs)):
+            if self.dirs[i] in self.keys:
+                if os.path.getmtime(os.path.join(self.root_dir, self.dirs[i])) < last_month:
+                    shutil.rmtree(os.path.join(self.root_dir, self.dirs[i]))
+                    count += 1
+        print("{} directories were deleted.".format(count))
+
     def run(self):
         """This function runs the program."""
         self.get_file_names()
         self.find_file_extension()
         self.create_dir()
         self.move_to_dirs()
+        self.deletion_check()
         print("{} seconds were taken.".format(time.time() - self.start))
 
 
