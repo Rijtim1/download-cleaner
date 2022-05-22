@@ -74,7 +74,7 @@ class Clean:
         self.find_file_extension()
         self.create_dir()
         self.move_to_dirs()
-        self.deletion_check()
+        # self.deletion_check()
         print("{} seconds were taken.".format(time.time() - self.start))
 
 
