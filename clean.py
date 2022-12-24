@@ -83,7 +83,7 @@ class Clean:
         self.find_file_extension()
         self.create_dir()
         
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.Pool(processes=4) as pool:
             pool.map(self.move_to_dirs, self.file_names)
         # self.move_to_dirs()
         # self.deletion_check()
