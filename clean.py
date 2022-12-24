@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import datetime
+import multiprocessing
 
 
 class Clean:
@@ -47,25 +48,23 @@ class Clean:
         print("{} directories were created.".format(count))
 
 
-    def move_to_dirs(self):
-        """This function moves the files to their respective directories, and removes duplicates."""
-        count = 0
-        for file_name in self.file_names:
-            extension = file_name.split(".")[-1]
-            file_path = os.path.join(self.root_dir, file_name)
-            destination_path = self.extension_dict[extension]
-            if os.path.exists(os.path.join(destination_path, file_name)):
-                # delete the duplicate file
+    def move_to_dirs(self, file_name):
+        """This function moves a file to its respective directory, and removes duplicates."""
+        extension = file_name.split(".")[-1]
+        file_path = os.path.join(self.root_dir, file_name)
+        destination_path = self.extension_dict[extension]
+        if os.path.exists(os.path.join(destination_path, file_name)):
+            # delete the duplicate file
+            os.remove(file_path)
+        else:
+            try:
+                shutil.move(file_path, destination_path)
+            except Exception as e:
+                print(str(e) + " deleting file...")
+                # delete the file
                 os.remove(file_path)
-            else:
-                try:
-                    shutil.move(file_path, destination_path)
-                    count += 1
-                except Exception as e:
-                    print(str(e) + " deleting file...")
-                    # delete the file
-                    os.remove(file_path)
-        print("{} files were moved.".format(count))
+
+            
 
     def deletion_check(self):
         """This function checks if the files are older than the specified number of months."""
@@ -83,7 +82,10 @@ class Clean:
         self.get_file_names()
         self.find_file_extension()
         self.create_dir()
-        self.move_to_dirs()
+        
+        with multiprocessing.Pool() as pool:
+            pool.map(self.move_to_dirs, self.file_names)
+        # self.move_to_dirs()
         # self.deletion_check()
         print("{} seconds were taken.".format(time.time() - self.start))
 
