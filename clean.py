@@ -15,46 +15,56 @@ class Clean:
 
     def get_file_names(self):
         """This function gets the file names in the downloads folder."""
-        self.root_dir, self.dirs, self.file_names = os.walk(
-            DOWNLOAD_PATH).__next__()
+        self.root_dir = DOWNLOAD_PATH
+        with os.scandir(self.root_dir) as entries:
+            self.file_names = [entry.name for entry in entries if entry.is_file()]
         if self.debug:
-            print(self.root_dir, self.dirs, self.file_names)
+            print(self.root_dir, self.file_names)
+
 
     def find_file_extension(self):
-        """This function finds the keys in the file names."""
+        """This function finds the file extensions and stores them in a dictionary."""
+        extension_dict = {}
         for i in range(len(self.file_names)):
-            # print(self.file_names[i].split("."))
             extension = self.file_names[i].split(".")[-1]
-            if extension not in self.keys:
-                self.keys.append(extension)
-        self.keys = list(set(self.keys))
+            if extension not in extension_dict:
+                extension_dict[extension] = os.path.join(self.root_dir, extension)
+        self.extension_dict = extension_dict
         if self.debug:
-            print(self.keys)
+            print(self.extension_dict)
 
     def create_dir(self):
-        """This function creates the directories."""
+        """This function creates the directories, if they do not already exist."""
         count = 0
         for i in range(len(self.keys)):
             if self.keys[i] not in self.dirs:
-                os.mkdir(os.path.join(self.root_dir, self.keys[i]))
-                count += 1
+                try:
+                    os.mkdir(os.path.join(self.root_dir, self.keys[i]))
+                    count += 1
+                except FileExistsError:
+                    # the file/directory with the same name already exists
+                    pass
         print("{} directories were created.".format(count))
 
+
     def move_to_dirs(self):
-        """This function moves the files to their respective directories."""
+        """This function moves the files to their respective directories, and removes duplicates."""
         count = 0
-        for i in range(len(self.file_names)):
-            extension = self.file_names[i].split(".")[-1]
-            if extension in self.keys:
+        for file_name in self.file_names:
+            extension = file_name.split(".")[-1]
+            file_path = os.path.join(self.root_dir, file_name)
+            destination_path = self.extension_dict[extension]
+            if os.path.exists(os.path.join(destination_path, file_name)):
+                # delete the duplicate file
+                os.remove(file_path)
+            else:
                 try:
-                    shutil.move(
-                        os.path.join(self.root_dir, self.file_names[i]),
-                        os.path.join(self.root_dir, extension))
+                    shutil.move(file_path, destination_path)
                     count += 1
                 except Exception as e:
                     print(str(e) + " deleting file...")
                     # delete the file
-                    os.remove(os.path.join(self.root_dir, self.file_names[i]))
+                    os.remove(file_path)
         print("{} files were moved.".format(count))
 
     def deletion_check(self):
