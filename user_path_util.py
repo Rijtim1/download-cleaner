@@ -29,5 +29,3 @@ def get_path():
     if path is None:
         path = None
     return path
-
-path = get_path()
