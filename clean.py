@@ -21,15 +21,17 @@ file_categories = {
     'Misc': []
 }
 
+
 class Clean:
     def __init__(self, path):
         self.path = path
         self.start = time.time()
-                            
+
     def list_files(self):
         items = os.listdir(self.path)
-        self.files = [item for item in items if os.path.isfile(f"{self.path}\\{item}")]
-        
+        self.files = [item for item in items if os.path.isfile(
+            f"{self.path}\\{item}")]
+
     def get_file_extension(self):
         self.extentions = []
         for files in self.files:
@@ -37,7 +39,7 @@ class Clean:
             # self.extentions.append(os.path.splitext(files)[1])
             if split[1] not in self.extentions:
                 self.extentions.append(split[1])
-        
+
     def setup(self, args):
         # Display a progress bar for the setup process
         with tqdm.tqdm(total=len(self.extentions), desc="Setting up directories") as pbar:
@@ -57,7 +59,6 @@ class Clean:
                 # Update the progress bar
                 pbar.update(1)
 
-    
     def move_files(self, args):
         # Create a mapping of file extensions to file categories
         extension_map = {}
@@ -80,23 +81,28 @@ class Clean:
                     if not args.dry_run:
                         # Move the file to the destination
                         try:
-                            shutil.move(os.path.join(self.path, file), destination)
+                            shutil.move(os.path.join(
+                                self.path, file), destination)
                         except shutil.Error:
                             os.remove(os.path.join(self.path, file))
                 # Update the progress bar
                 pbar.update(1)
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dry-run', action='store_true', help='show what changes would be made without actually moving the files')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='show what changes would be made without actually moving the files')
     # parser.add_argument('--path', help='Path of the directory to be cleaned')
     # parser.add_argument('--delete_empty', action='store_true', help='Delete empty directories after cleaning')
 
     return parser.parse_args()
 
+
 def get_path():
     # Use saved path or prompt user for path
     return user_path_util.get_path()
+
 
 def organize_folder(path, args):
     # Organize the folder at the specified path
@@ -110,6 +116,7 @@ def organize_folder(path, args):
     print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
     print(f"Total files moved: {len(clean.files)}")
 
+
 def main():
     args = parse_arguments()
     path = get_path()
@@ -117,6 +124,7 @@ def main():
         organize_folder(path, args)
     else:
         print(f"Invalid path: {path}")
+
 
 if __name__ == "__main__":
     main()
