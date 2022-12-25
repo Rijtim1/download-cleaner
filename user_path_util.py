@@ -1,8 +1,5 @@
 import os
 
-# Default path to the folder to be organized
-DEFAULT_PATH = "C:\\Users\\Username\\Downloads"
-
 def get_path():
     """Prompt the user for the path to the folder to be organized,
     or read the path from a file if it exists.
@@ -28,18 +25,7 @@ def get_path():
                     f.write(path)
             except FileNotFoundError:
                 print("Error: unable to save path to path.txt.")
-    return path
-
-def change_path_():
-    """Prompt the user for the path to the folder to be organized,
-    and give them the option to save it to the path.txt file.
-    """
-    path = input("Enter the path to the folder you want to organize: ")
-    save = input("Do you want to save this path? (y/n): ")
-    if save == "y":
-        try:
-            with open("path.txt", "w") as f:
-                f.write(path)
-        except FileNotFoundError:
-            print("Error: unable to save path to path.txt.")
+    # Use default path if no path was provided or found
+    if path is None:
+        path = None
     return path
