@@ -1,92 +1,122 @@
-from config import *
 import os
 import shutil
 import time
-import datetime
+import user_path_util
+import tqdm
+import argparse
+import user_path_util
 
+file_categories = {
+    'Documents': ['.doc', '.docx', '.pdf', '.txt', '.rtf', '.odt'],
+    'Spreadsheets': ['.xls', '.xlsx', '.ods'],
+    'Presentations': ['.ppt', '.pptx', '.odp'],
+    'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'],
+    'Videos': ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv'],
+    'Music': ['.mp3', '.wav', '.aac', '.m4a', '.flac'],
+    'Archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
+    'Executables': ['.exe', '.msi', '.dmg'],
+    'Scripts': ['.py', '.sh', '.js', '.php', '.pl'],
+    'Databases': ['.db', '.sqlite', '.mdb'],
+    'Webpages': ['.html', '.htm', '.css', '.xml'],
+    'Misc': []
+}
 
 class Clean:
-
-    def __init__(self):
-        self.file_names = []
-        self.keys = []
+    def __init__(self, path):
+        self.path = path
         self.start = time.time()
-        self.debug = False
+                            
+    def list_files(self):
+        items = os.listdir(self.path)
+        self.files = [item for item in items if os.path.isfile(f"{self.path}\\{item}")]
+        
+    def get_file_extension(self):
+        self.extentions = []
+        for files in self.files:
+            split = os.path.splitext(files)
+            # self.extentions.append(os.path.splitext(files)[1])
+            if split[1] not in self.extentions:
+                self.extentions.append(split[1])
+        
+    def setup(self, args):
+        # Display a progress bar for the setup process
+        with tqdm.tqdm(total=len(self.extentions), desc="Setting up directories") as pbar:
+            for ext in self.extentions:
+                for key, value in file_categories.items():
+                    if ext in value:
+                        category_dir = f"{self.path}\\{key}"
+                        if not os.path.exists(category_dir):
+                            # Check if dry run mode is enabled
+                            if not args.dry_run:
+                                os.mkdir(category_dir)
+                        extension_dir = f"{category_dir}\\{ext}"
+                        if not os.path.exists(extension_dir):
+                            # Check if dry run mode is enabled
+                            if not args.dry_run:
+                                os.mkdir(extension_dir)
+                # Update the progress bar
+                pbar.update(1)
 
-    def get_file_names(self):
-        """This function gets the file names in the downloads folder."""
-        self.root_dir = DOWNLOAD_PATH
-        with os.scandir(self.root_dir) as entries:
-            self.file_names = [entry.name for entry in entries if entry.is_file()]
-        if self.debug:
-            print(self.root_dir, self.file_names)
+    
+    def move_files(self, args):
+        # Create a mapping of file extensions to file categories
+        extension_map = {}
+        for category, extensions in file_categories.items():
+            for extension in extensions:
+                extension_map[extension] = category
+        # Display a progress bar for the file movement process
+        with tqdm.tqdm(total=len(self.files), desc="Moving files") as pbar:
+            # Move the files to the correct folders
+            for file in self.files:
+                # Get the file extension
+                extension = os.path.splitext(file)[1]
+                # Check if the file extension is in the extension map
+                if extension in extension_map:
+                    # Get the file category for the extension
+                    category = extension_map[extension]
+                    # Build the destination path for the file
+                    destination = os.path.join(self.path, category, extension)
+                    # Check if dry run mode is enabled
+                    if not args.dry_run:
+                        # Move the file to the destination
+                        try:
+                            shutil.move(os.path.join(self.path, file), destination)
+                        except shutil.Error:
+                            os.remove(os.path.join(self.path, file))
+                # Update the progress bar
+                pbar.update(1)
 
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dry-run', action='store_true', help='show what changes would be made without actually moving the files')
+    # parser.add_argument('--path', help='Path of the directory to be cleaned')
+    # parser.add_argument('--delete_empty', action='store_true', help='Delete empty directories after cleaning')
 
-    def find_file_extension(self):
-        """This function finds the file extensions and stores them in a dictionary."""
-        extension_dict = {}
-        for i in range(len(self.file_names)):
-            extension = self.file_names[i].split(".")[-1]
-            if extension not in extension_dict:
-                extension_dict[extension] = os.path.join(self.root_dir, extension)
-        self.extension_dict = extension_dict
-        if self.debug:
-            print(self.extension_dict)
+    return parser.parse_args()
 
-    def create_dir(self):
-        """This function creates the directories, if they do not already exist."""
-        count = 0
-        for i in range(len(self.keys)):
-            if self.keys[i] not in self.dirs:
-                try:
-                    os.mkdir(os.path.join(self.root_dir, self.keys[i]))
-                    count += 1
-                except FileExistsError:
-                    # the file/directory with the same name already exists
-                    pass
-        print("{} directories were created.".format(count))
+def get_path():
+    # Use saved path or prompt user for path
+    return user_path_util.get_path()
 
+def organize_folder(path, args):
+    # Organize the folder at the specified path
+    print(f"Organizing folder at {path}")
+    clean = Clean(path)
+    clean.list_files()
+    clean.get_file_extension()
+    clean.setup(args)
+    clean.move_files(args)
+    # Display the total time taken to organize the folder and the number of files moved
+    print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
+    print(f"Total files moved: {len(clean.files)}")
 
-    def move_to_dirs(self):
-        """This function moves the files to their respective directories, and removes duplicates."""
-        count = 0
-        for file_name in self.file_names:
-            extension = file_name.split(".")[-1]
-            file_path = os.path.join(self.root_dir, file_name)
-            destination_path = self.extension_dict[extension]
-            if os.path.exists(os.path.join(destination_path, file_name)):
-                # delete the duplicate file
-                os.remove(file_path)
-            else:
-                try:
-                    shutil.move(file_path, destination_path)
-                    count += 1
-                except Exception as e:
-                    print(str(e) + " deleting file...")
-                    # delete the file
-                    os.remove(file_path)
-        print("{} files were moved.".format(count))
-
-    def deletion_check(self):
-        """This function checks if the files are older than the specified number of months."""
-        last_month = datetime.datetime.now() - datetime.timedelta(days=DELETE_IF_UNUSED_AFTER)
-        count = 0
-        for i in range(len(self.dirs)):
-            if self.dirs[i] in self.keys:
-                if os.path.getmtime(os.path.join(self.root_dir, self.dirs[i])) < last_month:
-                    shutil.rmtree(os.path.join(self.root_dir, self.dirs[i]))
-                    count += 1
-        print("{} directories were deleted.".format(count))
-
-    def run(self):
-        """This function runs the program."""
-        self.get_file_names()
-        self.find_file_extension()
-        self.create_dir()
-        self.move_to_dirs()
-        # self.deletion_check()
-        print("{} seconds were taken.".format(time.time() - self.start))
-
+def main():
+    args = parse_arguments()
+    path = get_path()
+    if os.path.exists(path):
+        organize_folder(path, args)
+    else:
+        print(f"Invalid path: {path}")
 
 if __name__ == "__main__":
-    Clean().run()
+    main()
