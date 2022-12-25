@@ -4,6 +4,7 @@ import shutil
 import time
 import user_path_util
 import multiprocessing
+import tqdm
 
 class Clean:
     def __init__(self, path):
@@ -36,21 +37,25 @@ class Clean:
         for category, extensions in file_categories.items():
             for extension in extensions:
                 extension_map[extension] = category
-        # Move the files to the correct folders
-        for file in files:
-            # Get the file extension
-            extension = os.path.splitext(file)[1]
-            # Check if the file extension is in the extension map
-            if extension in extension_map:
-                # Get the file category for the extension
-                category = extension_map[extension]
-                # Build the destination path for the file
-                destination = os.path.join(self.path, category, extension)
-                # Move the file to the destination
-                try:
-                    shutil.move(os.path.join(self.path, file), destination)
-                except shutil.Error:
-                    os.remove(os.path.join(self.path, file))
+        # Display a progress bar for the file movement process
+        with tqdm.tqdm(total=len(files), desc="Moving files") as pbar:
+            # Move the files to the correct folders
+            for file in files:
+                # Get the file extension
+                extension = os.path.splitext(file)[1]
+                # Check if the file extension is in the extension map
+                if extension in extension_map:
+                    # Get the file category for the extension
+                    category = extension_map[extension]
+                    # Build the destination path for the file
+                    destination = os.path.join(self.path, category, extension)
+                    # Move the file to the destination
+                    try:
+                        shutil.move(os.path.join(self.path, file), destination)
+                    except shutil.Error:
+                        os.remove(os.path.join(self.path, file))
+                # Update the progress bar
+                pbar.update(1)
 
 
 def main():
