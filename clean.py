@@ -61,7 +61,6 @@ class Clean:
                 # Update the progress bar
                 pbar.update(1)
 
-
 def main():
     # Use saved path or prompt user for path
     path = user_path_util.get_path()
@@ -83,6 +82,9 @@ def main():
         with multiprocessing.Pool() as pool:
             # Use the map() method to apply the move_files() method to each chunk of files in parallel
             pool.map(clean.move_files, file_chunks)
+            
+        # Display the total time taken to organize the folder
+        print(f"Finished organizing folder at {path} in {time.time() - clean.start} seconds")
     else:
         print(f"Error: path {path} does not exist.")
 
