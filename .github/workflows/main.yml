@@ -18,8 +18,16 @@ jobs:
         python -m pip install pyinstaller
     - name: Create executable
       run: |
-        pyinstaller --onefile clean.py
+        pyinstaller --onefile --add-data="data/*;data" --hidden-import=pkg_resources.py2_warn script.py
+    - name: Check if release exists
+      id: check_release
+      uses: actions/get-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0
     - name: Create release
+      if: steps.check_release.outputs.id == ''
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,6 +37,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload artifact
+      if: steps.check_release.outputs.id == ''
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,4 +46,3 @@ jobs:
         asset_path: dist/script.exe
         asset_name: script.exe
         asset_content_type: application/octet-stream
-
