@@ -2,7 +2,6 @@ import os
 import shutil
 import time
 import user_path_util
-import multiprocessing
 import tqdm
 import argparse
 import user_path_util
@@ -34,7 +33,10 @@ class Clean:
     def get_file_extension(self):
         self.extentions = []
         for files in self.files:
-            self.extentions.append(os.path.splitext(files)[1])
+            split = os.path.splitext(files)
+            # self.extentions.append(os.path.splitext(files)[1])
+            if split[1] not in self.extentions:
+                self.extentions.append(split[1])
         
     def setup(self, args):
         # Display a progress bar for the setup process
@@ -56,17 +58,16 @@ class Clean:
                 pbar.update(1)
 
     
-    def move_files(self, files_and_args):
-        files, args = files_and_args
+    def move_files(self, args):
         # Create a mapping of file extensions to file categories
         extension_map = {}
         for category, extensions in file_categories.items():
             for extension in extensions:
                 extension_map[extension] = category
         # Display a progress bar for the file movement process
-        with tqdm.tqdm(total=len(files), desc="Moving files") as pbar:
+        with tqdm.tqdm(total=len(self.files), desc="Moving files") as pbar:
             # Move the files to the correct folders
-            for file in files:
+            for file in self.files:
                 # Get the file extension
                 extension = os.path.splitext(file)[1]
                 # Check if the file extension is in the extension map
@@ -104,19 +105,7 @@ def organize_folder(path, args):
     clean.list_files()
     clean.get_file_extension()
     clean.setup(args)
-    # Split the list of files into chunks
-    chunk_size = len(clean.files) // multiprocessing.cpu_count()
-    if chunk_size == 0:
-        file_chunks = [clean.files]
-    else:
-        file_chunks = [clean.files[i:i + chunk_size] for i in range(0, len(clean.files), chunk_size)]
-    # Create a pool of worker processes
-    with multiprocessing.Pool() as pool:
-        # Use the map() method to apply the move_files() method to each chunk of files in parallel
-        pool.map(clean.move_files, [(chunk, args) for chunk in file_chunks])
-
-    # if args.delete_empty:
-    #     clean.delete_empty_dirs()
+    clean.move_files(args)
     # Display the total time taken to organize the folder and the number of files moved
     print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
     print(f"Total files moved: {len(clean.files)}")
