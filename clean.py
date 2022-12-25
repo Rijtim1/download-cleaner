@@ -129,6 +129,5 @@ def main():
     else:
         print(f"Invalid path: {path}")
 
-
 if __name__ == "__main__":
     main()
