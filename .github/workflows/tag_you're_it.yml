@@ -1,4 +1,4 @@
-name: Create tag and release on merge
+name: Create tag and release on merge to master
 
 on:
   push:
