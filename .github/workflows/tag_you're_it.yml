@@ -1,0 +1,39 @@
+name: Create tag and release on merge
+
+on:
+  push:
+    branches:
+      - master
+
+steps:
+  # Check out the repository
+  - name: Checkout repository
+    uses: actions/checkout@v2
+  # Set up the Git executable and GITHUB_TOKEN environment variable
+  - name: Set up Git
+    uses: actions/setup-git@v2
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  # Create the tag and push it to the repository
+  - name: Create tag
+    run: |
+      git config --global user.email "action@github.com"
+      git config --global user.name "GitHub Action"
+      git tag v1.0.0-${{ github.event.after }}
+      git push origin v1.0.0-${{ github.event.after }}
+  # Create the release
+  - name: Create release
+    uses: actions/create-release@v1
+    with:
+      tag_name: v1.0.0-${{ github.event.after }}
+      release_name: v1.0.0-${{ github.event.after }}
+      draft: false
+      prerelease: false
+  # Upload the executable as an asset to the release
+  - name: Upload executable
+    uses: actions/upload-release-asset@v1
+    with:
+      upload_url: ${{ github.event.release.upload_url }}
+      asset_path: dist/my_code.exe
+      asset_name: my_code.exe
+      asset_content_type: application/octet-stream
