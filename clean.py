@@ -84,19 +84,6 @@ class Clean:
                             os.remove(os.path.join(self.path, file))
                 # Update the progress bar
                 pbar.update(1)
-                
-    # def delete_empty_dirs(self):
-    #     """Delete empty directories in the root directory"""
-    #     # Get a list of all directories in the root directory
-    #     dirs = [item for item in os.listdir(self.path) if os.path.isdir(os.path.join(self.path, item))]
-    #     # Display a progress bar for the deletion process
-    #     with tqdm.tqdm(total=len(dirs), desc="Deleting empty directories") as pbar:
-    #         # Iterate over the directories and delete them if they are empty
-    #         for directory in dirs:
-    #             if not os.listdir(os.path.join(self.path, directory)):
-    #                 os.rmdir(os.path.join(self.path, directory))
-    #             # Update the progress bar
-    #             pbar.update(1)
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
