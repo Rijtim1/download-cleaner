@@ -43,21 +43,3 @@ def change_path_():
         except FileNotFoundError:
             print("Error: unable to save path to path.txt.")
     return path
-
-# def main():
-#     # Ask user if they want to change the path
-#     change_path = input("Do you want to change the path? (y/n): ")
-#     if change_path == "y":
-#         path = change_path_()
-#     else:
-#         path = get_path()
-#     # Check if the path is valid
-#     if os.path.exists(path):
-#         # Organize the folder at the specified path
-#         # organize_folder(path)
-#         print(f"Organizing folder at {path}")
-#     else:
-#         print(f"Error: path {path} does not exist.")
-
-# if __name__ == "__main__":
-#     main()
