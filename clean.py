@@ -21,15 +21,19 @@ class Clean:
             self.extentions.append(os.path.splitext(files)[1])
         
     def setup(self):
-        for ext in self.extentions:
-            for key, value in file_categories.items():
-                if ext in value:
-                    category_dir = f"{self.path}\\{key}"
-                    if not os.path.exists(category_dir):
-                        os.mkdir(category_dir)
-                    extension_dir = f"{category_dir}\\{ext}"
-                    if not os.path.exists(extension_dir):
-                        os.mkdir(extension_dir)
+    # Display a progress bar for the setup process
+        with tqdm.tqdm(total=len(self.extentions), desc="Setting up directories") as pbar:
+            for ext in self.extentions:
+                for key, value in file_categories.items():
+                    if ext in value:
+                        category_dir = f"{self.path}\\{key}"
+                        if not os.path.exists(category_dir):
+                            os.mkdir(category_dir)
+                        extension_dir = f"{category_dir}\\{ext}"
+                        if not os.path.exists(extension_dir):
+                            os.mkdir(extension_dir)
+                # Update the progress bar
+                pbar.update(1)
     
     def move_files(self, files):
         # Create a mapping of file extensions to file categories
