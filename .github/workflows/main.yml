@@ -36,4 +36,5 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: dist/script.exe
         asset_name: script.exe
-        mime_type: application/octet-stream
+        asset_content_type: application/octet-stream
+
