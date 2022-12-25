@@ -70,38 +70,45 @@ class Clean:
                 # Update the progress bar
                 pbar.update(1)
 
-def main():
-    # Parse command-line arguments
+def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true', help='show what changes would be made without actually moving the files')
-    args = parser.parse_args()
+    return parser.parse_args()
 
+def get_path():
     # Use saved path or prompt user for path
-    path = user_path_util.get_path()
-    # Check if the path is valid
+    return user_path_util.get_path()
+
+def organize_folder(path, args):
+    # Organize the folder at the specified path
+    print(f"Organizing folder at {path}")
+    clean = Clean(path)
+    clean.list_files()
+    clean.get_file_extension()
+    clean.setup(args)
+    # Split the list of files into chunks
+    chunk_size = len(clean.files) // multiprocessing.cpu_count()
+    if chunk_size == 0:
+        file_chunks = [clean.files]
+    else:
+        file_chunks = [clean.files[i:i + chunk_size] for i in range(0, len(clean.files), chunk_size)]
+    # Create a pool of worker processes
+    with multiprocessing.Pool() as pool:
+        # Use the map() method to apply the move_files() method to each chunk of files in parallel
+        pool.map(clean.move_files, [(chunk, args) for chunk in file_chunks])
+
+    # Display the total time taken to organize the folder and the number of files moved
+    print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
+    print(f"Total files moved: {len(clean.files)}")
+
+def main():
+    args = parse_arguments()
+    path = get_path()
     if os.path.exists(path):
-        # Organize the folder at the specified path
-        print(f"Organizing folder at {path}")
-        clean = Clean(path)
-        clean.list_files()
-        clean.get_file_extension()
-        clean.setup(args)
-        # Split the list of files into chunks
-        chunk_size = len(clean.files) // multiprocessing.cpu_count()
-        if chunk_size == 0:
-            file_chunks = [clean.files]
-        else:
-            file_chunks = [clean.files[i:i + chunk_size] for i in range(0, len(clean.files), chunk_size)]
-        # Create a pool of worker processes
-        with multiprocessing.Pool() as pool:
-            # Use the map() method to apply the move_files() method to each chunk of files in parallel
-            pool.map(clean.move_files, [(chunk, args) for chunk in file_chunks])
-            
-        # Display the total time taken to organize the folder and the number of files moved
-        print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
-        print(f"Total files moved: {len(clean.files)}")
+        organize_folder(path, args)
     else:
         print(f"Invalid path: {path}")
+
 
 if __name__ == "__main__":
     main()
