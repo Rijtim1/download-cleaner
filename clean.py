@@ -84,10 +84,23 @@ class Clean:
                             os.remove(os.path.join(self.path, file))
                 # Update the progress bar
                 pbar.update(1)
+                
+    def delete_empty_dirs(self):
+        """Delete empty directories in the root directory"""
+        # Get a list of all directories in the root directory
+        dirs = [item for item in os.listdir(self.path) if os.path.isdir(os.path.join(self.path, item))]
+        # Iterate over the directories and delete them if they are empty
+        for directory in dirs:
+            if not os.listdir(os.path.join(self.path, directory)):
+                os.rmdir(os.path.join(self.path, directory))
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true', help='show what changes would be made without actually moving the files')
+    parser.add_argument('--path', help='Path of the directory to be cleaned')
+    parser.add_argument('--delete_empty', action='store_true', help='Delete empty directories after cleaning')
+
     return parser.parse_args()
 
 def get_path():
@@ -97,7 +110,7 @@ def get_path():
 def organize_folder(path, args):
     # Organize the folder at the specified path
     print(f"Organizing folder at {path}")
-    clean = Clean(path)
+    clean = Clean(args.path)
     clean.list_files()
     clean.get_file_extension()
     clean.setup(args)
@@ -112,6 +125,8 @@ def organize_folder(path, args):
         # Use the map() method to apply the move_files() method to each chunk of files in parallel
         pool.map(clean.move_files, [(chunk, args) for chunk in file_chunks])
 
+    if args.delete_empty:
+        clean.delete_empty_dirs()
     # Display the total time taken to organize the folder and the number of files moved
     print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
     print(f"Total files moved: {len(clean.files)}")
