@@ -81,12 +81,29 @@ class Clean:
                     if not args.dry_run:
                         # Move the file to the destination
                         try:
-                            shutil.move(os.path.join(
-                                self.path, file), destination)
+                            shutil.move(os.path.join(self.path, file), destination)
+                        except shutil.Error:
+                            os.remove(os.path.join(self.path, file))
+                else:
+                    # File extension is not in the extension map, so move the file to the "Misc" directory
+                    misc_dir = os.path.join(self.path, "Misc")
+                    # Check if the "Misc" directory exists, and create it if it doesn't
+                    if not os.path.exists(misc_dir):
+                        # Check if dry run mode is enabled
+                        if not args.dry_run:
+                            os.mkdir(misc_dir)
+                    # Build the destination path for the file
+                    destination = os.path.join(misc_dir, file)
+                    # Check if dry run mode is enabled
+                    if not args.dry_run:
+                        # Move the file to the destination
+                        try:
+                            shutil.move(os.path.join(self.path, file), destination)
                         except shutil.Error:
                             os.remove(os.path.join(self.path, file))
                 # Update the progress bar
                 pbar.update(1)
+
 
 
 def parse_arguments():
