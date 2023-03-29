@@ -128,5 +128,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # why isnt the action working
     main()
