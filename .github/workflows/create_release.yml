@@ -3,10 +3,10 @@ name: On push to master, generate .exe, and create a release
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
