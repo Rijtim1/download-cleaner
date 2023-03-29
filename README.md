@@ -1,6 +1,4 @@
-[![Generate Release on Merge to Main](https://github.com/Rijtim1/download-cleaner/actions/workflows/create_release.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/create_release.yml)
-
-
+[![Workflow](https://github.com/Rijtim1/download-cleaner/actions/workflows/workflow.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/workflow.yml)
 
 # Download Cleaner
 
