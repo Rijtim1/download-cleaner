@@ -1,3 +1,7 @@
+[![Generate Release on Merge to Main](https://github.com/Rijtim1/download-cleaner/actions/workflows/create_release.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/create_release.yml)
+
+
+
 # Download Cleaner
 
 This is a python script I wrote to clean/organize the downloads folder.
