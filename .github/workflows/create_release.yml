@@ -29,6 +29,7 @@ jobs:
 
       - name: Create release
         uses: actions/create-release@v1
+        token: ${{ secrets.GH_TOKEN }}
         with:
           tag_name: v1.0.$(date +%s)
           release_name: Release v1.0.$(date +%s)
