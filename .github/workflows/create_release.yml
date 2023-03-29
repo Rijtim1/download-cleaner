@@ -21,8 +21,11 @@ jobs:
       - name: Install PyInstaller
         run: pip install pyinstaller
 
-      - name: Run setup.bat to create executable
-        run: setup.bat
+      - name: Install Requirements
+        run: pip install -r requirements.txt
+
+      - name: Create executable
+        run: pyinstaller --onefile clean.py --icon=mr_clean.ico
 
       - name: Create release
         uses: actions/create-release@v1
