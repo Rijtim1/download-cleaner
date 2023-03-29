@@ -1,0 +1,47 @@
+name: Workflow
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Install Requirements
+        run: pip install -r requirements.txt
+
+      - name: Create executable
+        run: pyinstaller --onefile clean.py --icon=mr_clean.ico
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: v1.0.$(date +%s)
+          release_name: Release v1.0.$(date +%s)
+          body: |
+            Release v1.0.$(date +%s)
+          draft: false
+          prerelease: false
+
+      - name: Upload executable
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/clean.exe
+          asset_name: clean.exe
+          asset_content_type: application/x-msdownload
