@@ -1,4 +1,4 @@
-name: Generate Release on Merge to Master Branch
+name: On push to master, generate .exe, and create a release
 
 on:
   push:
