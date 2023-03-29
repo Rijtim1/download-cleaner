@@ -3,7 +3,7 @@ name: Generate Release on Merge to Main
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -28,8 +28,10 @@ jobs:
         run: pyinstaller --onefile clean.py --icon=mr_clean.ico
 
       - name: Create release
+        id: create_release
         uses: actions/create-release@v1
-        token: ${{ secrets.GH_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           tag_name: v1.0.$(date +%s)
           release_name: Release v1.0.$(date +%s)
@@ -40,6 +42,8 @@ jobs:
 
       - name: Upload executable
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/clean.exe
