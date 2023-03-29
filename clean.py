@@ -1,10 +1,10 @@
 import os
 import shutil
 import time
-import user_path_util
-import tqdm
 import argparse
+import tqdm
 import user_path_util
+
 
 file_categories = {
     'Documents': ['.doc', '.docx', '.pdf', '.txt', '.rtf', '.odt'],
@@ -30,13 +30,12 @@ class Clean:
     def list_files(self):
         items = os.listdir(self.path)
         self.files = [item for item in items if os.path.isfile(
-            f"{self.path}\\{item}")]
+            os.path.join(self.path, item))]
 
     def get_file_extension(self):
         self.extentions = []
         for files in self.files:
             split = os.path.splitext(files)
-            # self.extentions.append(os.path.splitext(files)[1])
             if split[1] not in self.extentions:
                 self.extentions.append(split[1])
 
@@ -46,17 +45,14 @@ class Clean:
             for ext in self.extentions:
                 for key, value in file_categories.items():
                     if ext in value:
-                        category_dir = f"{self.path}\\{key}"
+                        category_dir = os.path.join(self.path, key)
                         if not os.path.exists(category_dir):
-                            # Check if dry run mode is enabled
                             if not args.dry_run:
                                 os.mkdir(category_dir)
-                        extension_dir = f"{category_dir}\\{ext}"
+                        extension_dir = os.path.join(category_dir, ext)
                         if not os.path.exists(extension_dir):
-                            # Check if dry run mode is enabled
                             if not args.dry_run:
                                 os.mkdir(extension_dir)
-                # Update the progress bar
                 pbar.update(1)
 
     def move_files(self, args):
@@ -65,46 +61,34 @@ class Clean:
         for category, extensions in file_categories.items():
             for extension in extensions:
                 extension_map[extension] = category
+
         # Display a progress bar for the file movement process
         with tqdm.tqdm(total=len(self.files), desc="Moving files") as pbar:
-            # Move the files to the correct folders
+            # Iterate over each file in the list of files
             for file in self.files:
                 # Get the file extension
                 extension = os.path.splitext(file)[1]
-                # Check if the file extension is in the extension map
-                if extension in extension_map:
-                    # Get the file category for the extension
-                    category = extension_map[extension]
-                    # Build the destination path for the file
-                    destination = os.path.join(self.path, category, extension)
+                # Determine the file category
+                category = extension_map.get(extension, "Misc")
+                # Construct the destination path for the file
+                dest_dir = os.path.join(self.path, category)
+                dest_file = os.path.join(dest_dir, file)
+                # Check if the destination directory exists, and create it if it doesn't
+                if not os.path.exists(dest_dir):
                     # Check if dry run mode is enabled
                     if not args.dry_run:
-                        # Move the file to the destination
-                        try:
-                            shutil.move(os.path.join(self.path, file), destination)
-                        except shutil.Error:
-                            os.remove(os.path.join(self.path, file))
+                        os.mkdir(dest_dir)
+                # Check if the file already exists in the destination directory
+                if os.path.exists(dest_file):
+                    # If the file already exists, delete it
+                    if not args.dry_run:
+                        os.remove(os.path.join(self.path, file))
                 else:
-                    # File extension is not in the extension map, so move the file to the "Misc" directory
-                    misc_dir = os.path.join(self.path, "Misc")
-                    # Check if the "Misc" directory exists, and create it if it doesn't
-                    if not os.path.exists(misc_dir):
-                        # Check if dry run mode is enabled
-                        if not args.dry_run:
-                            os.mkdir(misc_dir)
-                    # Build the destination path for the file
-                    destination = os.path.join(misc_dir, file)
-                    # Check if dry run mode is enabled
+                    # If the file doesn't exist, move it to the destination directory
                     if not args.dry_run:
-                        # Move the file to the destination
-                        try:
-                            shutil.move(os.path.join(self.path, file), destination)
-                        except shutil.Error:
-                            os.remove(os.path.join(self.path, file))
+                        shutil.move(os.path.join(self.path, file), dest_file)
                 # Update the progress bar
                 pbar.update(1)
-
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
