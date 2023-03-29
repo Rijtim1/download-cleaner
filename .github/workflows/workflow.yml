@@ -29,10 +29,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          tag_name: v1.0.$(date +%s)
-          release_name: Release v1.0.$(date +%s)
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
           body: |
-            Release v1.0.$(date +%s)
+            Release v1.0.0
           draft: false
           prerelease: false
 
