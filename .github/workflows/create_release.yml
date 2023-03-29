@@ -1,4 +1,4 @@
-name: Generate Release on Merge to Main
+name: Generate Release on Merge to Master Branch
 
 on:
   push:
