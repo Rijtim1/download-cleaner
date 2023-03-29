@@ -1,4 +1,4 @@
-name: Workflow
+name: Create executable and release
 on: [push]
 
 jobs:
@@ -23,25 +23,46 @@ jobs:
       - name: Create executable
         run: pyinstaller --onefile clean.py --icon=mr_clean.ico
 
-      - name: Create release
-        id: create_release
+      # - name: Create release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      #   with:
+      #     tag_name: v1.0.0
+      #     release_name: Release v1.0.0
+      #     body: |
+      #       Release v1.0.0
+      #     draft: false
+      #     prerelease: false
+
+      # - name: Upload executable
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./dist/clean.exe
+      #     asset_name: clean.exe
+      #     asset_content_type: application/x-msdownload
+
+      - name: Create tag and release
+        id: create_tag
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
           body: |
-            Release v1.0.0
-          draft: false
-          prerelease: false
+            Release v${{ github.run_number }}
 
       - name: Upload executable
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_tag.outputs.upload_url }}
           asset_path: ./dist/clean.exe
           asset_name: clean.exe
           asset_content_type: application/x-msdownload
