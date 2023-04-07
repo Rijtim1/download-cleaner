@@ -82,13 +82,13 @@ class Clean:
                 if os.path.exists(dest_file):
                     # If the file already exists, delete it
                     if not args.dry_run:
-                        os.remove(os.path.join(self.path, file))
-                else:
-                    # If the file doesn't exist, move it to the destination directory
-                    if not args.dry_run:
-                        shutil.move(os.path.join(self.path, file), dest_file)
+                        os.remove(dest_file)
+                # Move the file to the destination directory
+                if not args.dry_run:
+                    shutil.move(os.path.join(self.path, file), dest_file)
                 # Update the progress bar
                 pbar.update(1)
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
