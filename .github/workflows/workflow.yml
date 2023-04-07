@@ -24,7 +24,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Create executable
-        run: pyinstaller --onefile clean.py --icon=mr_clean.ico
+        run: pyinstaller --onefile clean.py --icon=logo.ico
 
       - name: Create tag and release
         id: create_tag
