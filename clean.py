@@ -33,23 +33,23 @@ class Clean:
             os.path.join(self.path, item))]
 
     def get_file_extension(self):
-        self.extentions = []
-        for files in self.files:
-            split = os.path.splitext(files)
-            if split[1] not in self.extentions:
-                self.extentions.append(split[1])
+        self.extensions = []
+        for file in self.files:
+            split = os.path.splitext(file)
+            if split[1] not in self.extensions:
+                self.extensions.append(split[1])
 
     def setup(self, args):
         # Display a progress bar for the setup process
-        with tqdm.tqdm(total=len(self.extentions), desc="Setting up directories") as pbar:
-            for ext in self.extentions:
+        with tqdm.tqdm(total=len(self.extensions), desc="Setting up directories") as pbar:
+            for extension in self.extensions:
                 for key, value in file_categories.items():
-                    if ext in value:
+                    if extension in value:
                         category_dir = os.path.join(self.path, key)
                         if not os.path.exists(category_dir):
                             if not args.dry_run:
                                 os.mkdir(category_dir)
-                        extension_dir = os.path.join(category_dir, ext)
+                        extension_dir = os.path.join(category_dir, extension)
                         if not os.path.exists(extension_dir):
                             if not args.dry_run:
                                 os.mkdir(extension_dir)
@@ -61,6 +61,9 @@ class Clean:
         for category, extensions in file_categories.items():
             for extension in extensions:
                 extension_map[extension] = category
+
+        # Create a dictionary to track encountered file names and their counts
+        file_counts = {}
 
         # Display a progress bar for the file movement process
         with tqdm.tqdm(total=len(self.files), desc="Moving files") as pbar:
@@ -80,9 +83,25 @@ class Clean:
                         os.mkdir(dest_dir)
                 # Check if the file already exists in the destination directory
                 if os.path.exists(dest_file):
-                    # If the file already exists, delete it
-                    if not args.dry_run:
-                        os.remove(dest_file)
+                    # Handle duplicate file
+                    if args.rename_duplicates:
+                        # Rename the duplicate file
+                        count = file_counts.get(file, 0) + 1
+                        new_file_name = f"{os.path.splitext(file)[0]}_{count}{extension}"
+                        dest_file = os.path.join(dest_dir, new_file_name)
+                        file_counts[file] = count
+                    elif args.merge_duplicates:
+                        # Merge the duplicate file by appending its contents
+                        merged_file = open(dest_file, "ab")
+                        current_file = open(os.path.join(self.path, file), "rb")
+                        shutil.copyfileobj(current_file, merged_file)
+                        current_file.close()
+                        merged_file.close()
+                        continue  # Skip moving the duplicate file
+                    else:
+                        # If no handling option specified, delete the duplicate file
+                        if not args.dry_run:
+                            os.remove(dest_file)
                 # Move the file to the destination directory
                 if not args.dry_run:
                     shutil.move(os.path.join(self.path, file), dest_file)
@@ -94,8 +113,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true',
                         help='show what changes would be made without actually moving the files')
-    # parser.add_argument('--path', help='Path of the directory to be cleaned')
-    # parser.add_argument('--delete_empty', action='store_true', help='Delete empty directories after cleaning')
 
     return parser.parse_args()
 
@@ -125,6 +142,7 @@ def main():
         organize_folder(path, args)
     else:
         print(f"Invalid path: {path}")
-        
+
+
 if __name__ == "__main__":
     main()
