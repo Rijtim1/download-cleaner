@@ -1,5 +1,7 @@
 # File Organization Script Documentation
 
+[![Build EXE](https://github.com/Rijtim1/download-cleaner/actions/workflows/main.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/main.yml)
+
 The file organization script is a Python script that helps you organize files in a specified folder based on their file extensions. It categorizes files into different directories based on their extensions and moves them accordingly.
 
 ## Prerequisites
