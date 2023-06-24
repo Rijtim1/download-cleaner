@@ -1,7 +1,6 @@
 import os
 import shutil
 import time
-import argparse
 import tqdm
 import user_path_util
 
@@ -39,107 +38,63 @@ class Clean:
             if split[1] not in self.extensions:
                 self.extensions.append(split[1])
 
-    def setup(self, args):
-        # Display a progress bar for the setup process
+    def setup(self):
         with tqdm.tqdm(total=len(self.extensions), desc="Setting up directories") as pbar:
             for extension in self.extensions:
                 for key, value in file_categories.items():
                     if extension in value:
                         category_dir = os.path.join(self.path, key)
                         if not os.path.exists(category_dir):
-                            if not args.dry_run:
-                                os.mkdir(category_dir)
+                            os.mkdir(category_dir)
                         extension_dir = os.path.join(category_dir, extension)
                         if not os.path.exists(extension_dir):
-                            if not args.dry_run:
-                                os.mkdir(extension_dir)
+                            os.mkdir(extension_dir)
                 pbar.update(1)
 
-    def move_files(self, args):
-        # Create a mapping of file extensions to file categories
+    def move_files(self):
         extension_map = {}
         for category, extensions in file_categories.items():
             for extension in extensions:
                 extension_map[extension] = category
 
-        # Create a dictionary to track encountered file names and their counts
         file_counts = {}
 
-        # Display a progress bar for the file movement process
         with tqdm.tqdm(total=len(self.files), desc="Moving files") as pbar:
-            # Iterate over each file in the list of files
             for file in self.files:
-                # Get the file extension
                 extension = os.path.splitext(file)[1]
-                # Determine the file category
                 category = extension_map.get(extension, "Misc")
-                # Construct the destination path for the file
                 dest_dir = os.path.join(self.path, category)
                 dest_file = os.path.join(dest_dir, file)
-                # Check if the destination directory exists, and create it if it doesn't
                 if not os.path.exists(dest_dir):
-                    # Check if dry run mode is enabled
-                    if not args.dry_run:
-                        os.mkdir(dest_dir)
-                # Check if the file already exists in the destination directory
+                    os.mkdir(dest_dir)
                 if os.path.exists(dest_file):
-                    # Handle duplicate file
-                    if args.rename_duplicates:
-                        # Rename the duplicate file
-                        count = file_counts.get(file, 0) + 1
-                        new_file_name = f"{os.path.splitext(file)[0]}_{count}{extension}"
-                        dest_file = os.path.join(dest_dir, new_file_name)
-                        file_counts[file] = count
-                    elif args.merge_duplicates:
-                        # Merge the duplicate file by appending its contents
-                        merged_file = open(dest_file, "ab")
-                        current_file = open(os.path.join(self.path, file), "rb")
-                        shutil.copyfileobj(current_file, merged_file)
-                        current_file.close()
-                        merged_file.close()
-                        continue  # Skip moving the duplicate file
-                    else:
-                        # If no handling option specified, delete the duplicate file
-                        if not args.dry_run:
-                            os.remove(dest_file)
-                # Move the file to the destination directory
-                if not args.dry_run:
-                    shutil.move(os.path.join(self.path, file), dest_file)
-                # Update the progress bar
+                    count = file_counts.get(file, 0) + 1
+                    new_file_name = f"{os.path.splitext(file)[0]}_{count}{extension}"
+                    dest_file = os.path.join(dest_dir, new_file_name)
+                    file_counts[file] = count
+                shutil.move(os.path.join(self.path, file), dest_file)
                 pbar.update(1)
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dry-run', action='store_true',
-                        help='show what changes would be made without actually moving the files')
-
-    return parser.parse_args()
-
-
 def get_path():
-    # Use saved path or prompt user for path
     return user_path_util.get_path()
 
 
-def organize_folder(path, args):
-    # Organize the folder at the specified path
+def organize_folder(path):
     print(f"Organizing folder at {path}")
     clean = Clean(path)
     clean.list_files()
     clean.get_file_extension()
-    clean.setup(args)
-    clean.move_files(args)
-    # Display the total time taken to organize the folder and the number of files moved
+    clean.setup()
+    clean.move_files()
     print(f"Total time taken: {time.time() - clean.start:.2f} seconds")
     print(f"Total files moved: {len(clean.files)}")
 
 
 def main():
-    args = parse_arguments()
     path = get_path()
     if os.path.exists(path):
-        organize_folder(path, args)
+        organize_folder(path)
     else:
         print(f"Invalid path: {path}")
 
