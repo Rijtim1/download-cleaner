@@ -2,7 +2,6 @@ import os
 import shutil
 import time
 import tqdm
-import user_path_util
 
 
 file_categories = {
@@ -76,8 +75,8 @@ class Clean:
                 pbar.update(1)
 
 
-def get_path():
-    return user_path_util.get_path()
+def get_downloads_path():
+    return os.path.expanduser("~/Downloads")
 
 
 def organize_folder(path):
@@ -92,11 +91,11 @@ def organize_folder(path):
 
 
 def main():
-    path = get_path()
-    if os.path.exists(path):
-        organize_folder(path)
+    downloads_path = get_downloads_path()
+    if os.path.exists(downloads_path):
+        organize_folder(downloads_path)
     else:
-        print(f"Invalid path: {path}")
+        print(f"Downloads folder not found.")
 
 
 if __name__ == "__main__":
