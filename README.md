@@ -1,6 +1,6 @@
 # Clean Class Documentation
 
-## [![Workflow](https://github.com/Rijtim1/download-cleaner/actions/workflows/workflow.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/workflow.yml)
+## [![Build EXE](https://github.com/Rijtim1/download-cleaner/actions/workflows/build.yml/badge.svg)](https://github.com/Rijtim1/download-cleaner/actions/workflows/build.yml)
 
 The Clean class provides functionality to organize files in a specified directory based on their file extension. The class has the following methods:
 
