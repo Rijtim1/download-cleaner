@@ -62,18 +62,28 @@ class Clean:
             for file in self.files:
                 extension = os.path.splitext(file)[1]
                 category = extension_map.get(extension, "Misc")
-                dest_dir = os.path.join(self.path, category)
-                dest_file = os.path.join(dest_dir, file)
-                if not os.path.exists(dest_dir):
-                    os.mkdir(dest_dir)
+                category_dir = os.path.join(self.path, category)
+                extension_dir = os.path.join(category_dir, extension)
+                dest_file = os.path.join(extension_dir, file)
+
+                # Handle duplicate files
                 if os.path.exists(dest_file):
                     count = file_counts.get(file, 0) + 1
                     new_file_name = f"{os.path.splitext(file)[0]}_{count}{extension}"
-                    dest_file = os.path.join(dest_dir, new_file_name)
+                    dest_file = os.path.join(extension_dir, new_file_name)
                     file_counts[file] = count
+
+                # Create the category directory if it doesn't exist
+                if not os.path.exists(category_dir):
+                    os.mkdir(category_dir)
+
+                # Create the extension directory if it doesn't exist
+                if not os.path.exists(extension_dir):
+                    os.mkdir(extension_dir)
+
+                # Move the file to the destination directory
                 shutil.move(os.path.join(self.path, file), dest_file)
                 pbar.update(1)
-
 
 def get_downloads_path():
     return os.path.expanduser("~/Downloads")
