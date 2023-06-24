@@ -2,7 +2,6 @@ import os
 import shutil
 import time
 import tqdm
-import user_path_util
 
 
 file_categories = {
@@ -17,6 +16,11 @@ file_categories = {
     'Scripts': ['.py', '.sh', '.js', '.php', '.pl'],
     'Databases': ['.db', '.sqlite', '.mdb'],
     'Webpages': ['.html', '.htm', '.css', '.xml'],
+    'Text Files': ['.txt', '.log'],
+    'Spreadsheets': ['.xls', '.xlsx', '.ods'],
+    'Presentations': ['.ppt', '.pptx', '.odp'],
+    'Code Files': ['.py', '.java', '.cpp', '.h', '.html', '.css', '.js'],
+    'Compressed Files': ['.zip', '.rar', '.7z', '.tar', '.gz'],
     'Misc': []
 }
 
@@ -63,21 +67,32 @@ class Clean:
             for file in self.files:
                 extension = os.path.splitext(file)[1]
                 category = extension_map.get(extension, "Misc")
-                dest_dir = os.path.join(self.path, category)
-                dest_file = os.path.join(dest_dir, file)
-                if not os.path.exists(dest_dir):
-                    os.mkdir(dest_dir)
+                category_dir = os.path.join(self.path, category)
+                extension_dir = os.path.join(category_dir, extension)
+                dest_file = os.path.join(extension_dir, file)
+
+                # Handle duplicate files
                 if os.path.exists(dest_file):
                     count = file_counts.get(file, 0) + 1
                     new_file_name = f"{os.path.splitext(file)[0]}_{count}{extension}"
-                    dest_file = os.path.join(dest_dir, new_file_name)
+                    dest_file = os.path.join(extension_dir, new_file_name)
                     file_counts[file] = count
+
+                # Create the category directory if it doesn't exist
+                if not os.path.exists(category_dir):
+                    os.mkdir(category_dir)
+
+                # Create the extension directory if it doesn't exist
+                if not os.path.exists(extension_dir):
+                    os.mkdir(extension_dir)
+
+                # Move the file to the destination directory
                 shutil.move(os.path.join(self.path, file), dest_file)
                 pbar.update(1)
 
 
-def get_path():
-    return user_path_util.get_path()
+def get_downloads_path():
+    return os.path.expanduser("~/Downloads")
 
 
 def organize_folder(path):
@@ -92,11 +107,11 @@ def organize_folder(path):
 
 
 def main():
-    path = get_path()
-    if os.path.exists(path):
-        organize_folder(path)
+    downloads_path = get_downloads_path()
+    if os.path.exists(downloads_path):
+        organize_folder(downloads_path)
     else:
-        print(f"Invalid path: {path}")
+        print(f"Downloads folder not found.")
 
 
 if __name__ == "__main__":
