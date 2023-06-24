@@ -3,7 +3,6 @@ import shutil
 import time
 import tqdm
 
-# test
 
 file_categories = {
     'Documents': ['.doc', '.docx', '.pdf', '.txt', '.rtf', '.odt'],
