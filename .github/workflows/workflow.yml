@@ -1,8 +1,11 @@
 name: Create tag and release
+
 on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -36,8 +39,7 @@ jobs:
           release_name: Release v${{ github.run_number }}
           body: |
             Release v${{ github.run_number }}
-
-          # Upload the executable as a release asset
           asset_path: ./dist/clean.exe
           asset_name: clean.exe
           asset_content_type: application/x-msdownload
+
