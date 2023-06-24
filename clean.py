@@ -16,6 +16,11 @@ file_categories = {
     'Scripts': ['.py', '.sh', '.js', '.php', '.pl'],
     'Databases': ['.db', '.sqlite', '.mdb'],
     'Webpages': ['.html', '.htm', '.css', '.xml'],
+    'Text Files': ['.txt', '.log'],
+    'Spreadsheets': ['.xls', '.xlsx', '.ods'],
+    'Presentations': ['.ppt', '.pptx', '.odp'],
+    'Code Files': ['.py', '.java', '.cpp', '.h', '.html', '.css', '.js'],
+    'Compressed Files': ['.zip', '.rar', '.7z', '.tar', '.gz'],
     'Misc': []
 }
 
@@ -84,6 +89,7 @@ class Clean:
                 # Move the file to the destination directory
                 shutil.move(os.path.join(self.path, file), dest_file)
                 pbar.update(1)
+
 
 def get_downloads_path():
     return os.path.expanduser("~/Downloads")
