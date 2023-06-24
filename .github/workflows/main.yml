@@ -35,5 +35,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: clean.exe
-        path: /home/runner/work/download-cleaner/download-cleaner/dist/clean
+        name: clean
+        path: /home/runner/work/download-cleaner/download-cleaner/dist/clean.exe
