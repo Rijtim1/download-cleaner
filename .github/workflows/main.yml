@@ -1,4 +1,4 @@
-name: Build and Release EXE
+name: Build and Test
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +29,10 @@ jobs:
         pip install pyinstaller
         pip install -r "requirements.txt"
 
-    - name: Build EXE
+    # - name: Build EXE
+    #   run: |
+    #     python create-exe.py
+
+    - name: Run tests
       run: |
-        pyinstaller --onefile clean.py --icon=logo.ico
+        python test.py
