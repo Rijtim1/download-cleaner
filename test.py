@@ -223,7 +223,9 @@ class FileOrganizationTestCase(unittest.TestCase):
             file_path = os.path.join(self.test_folder, file_name)
             extension = os.path.splitext(file_name)[1]
             category = custom_file_categories.get(extension, "Misc")  # Default to "Misc" if extension not recognized
+            print("-------------------", self.test_folder, category, file_name)
             expected_path = os.path.join(self.test_folder, category, file_name)
+            print("-------------------", expected_path)
             self.assertTrue(os.path.exists(expected_path))
 
 
