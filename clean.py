@@ -15,10 +15,10 @@ file_categories = {
     'Scripts': ['.py', '.sh', '.js', '.php', '.pl'],
     'Databases': ['.db', '.sqlite', '.mdb'],
     'Webpages': ['.html', '.htm', '.css', '.xml'],
-    'Text Files': ['.txt', '.log'],
-    'Code Files': ['.py', '.java', '.cpp', '.h', '.html', '.css', '.js'],
+    'Text Files': ['.log'],
+    'Code Files': ['.java', '.cpp', '.h'],
     'Compressed Files': ['.zip', '.rar', '.7z', '.tar', '.gz'],
-    'Misc': []  # Miscellaneous files with no recognized category
+    'Misc': []
 }
 
 
