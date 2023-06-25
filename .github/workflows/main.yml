@@ -32,24 +32,3 @@ jobs:
     - name: Build EXE
       run: |
         pyinstaller --onefile clean.py --icon=logo.ico
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v1.0.0  # Specify the desired tag for the release
-        release_name: Release v1.0.0  # Specify the desired release name
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: /home/runner/work/download-cleaner/download-cleaner/dist/clean
-        asset_name: clean.exe
-        asset_content_type: application/octet-stream
