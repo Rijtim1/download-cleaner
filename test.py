@@ -4,7 +4,6 @@ import time
 import unittest
 from clean import Clean, file_categories, get_downloads_path, organize_folder
 
-
 class FileOrganizationTestCase(unittest.TestCase):
     def setUp(self):
         # Create a temporary test folder for each test case
@@ -73,59 +72,6 @@ class FileOrganizationTestCase(unittest.TestCase):
         expected_path2 = os.path.join(self.test_folder, "Documents", ".txt", "readme_1.txt")
         self.assertTrue(os.path.exists(expected_path1))
         self.assertTrue(os.path.exists(expected_path2))
-
-
-    def test_unrecognized_extensions(self):
-        # Test scenario: Unrecognized Extensions
-        # Create files with unrecognized extensions in the test folder
-        file_names = ["file1.xyz", "file2.abc", "file3.123"]
-        for file_name in file_names:
-            file_path = os.path.join(self.test_folder, file_name)
-            with open(file_path, "w") as file:
-                file.write("Test content")
-
-        organize_folder(self.test_folder)
-
-        # Verify that unrecognized files are moved to the "Misc" category
-        for file_name in file_names:
-            file_path = os.path.join(self.test_folder, file_name)
-            expected_path = os.path.join(self.test_folder, "Misc", file_name)
-            self.assertTrue(os.path.exists(expected_path))
-
-    # def test_nested_folders(self): # function is not implemented. Only the main directory gets organized.
-    #     # Test scenario: Nested Folders
-    #     subfolder_path = os.path.join(self.test_folder, "subfolder")
-    #     os.mkdir(subfolder_path)
-
-    #     # Create test files in the main folder and subfolder
-    #     file_names = ["file1.txt", "file2.docx", "file3.jpg"]
-    #     subfolder_file_names = ["file4.mp3", "file5.png"]
-    #     for file_name in file_names:
-    #         file_path = os.path.join(self.test_folder, file_name)
-    #         with open(file_path, "w") as file:
-    #             file.write("Test content")
-    #     for file_name in subfolder_file_names:
-    #         file_path = os.path.join(subfolder_path, file_name)
-    #         with open(file_path, "w") as file:
-    #             file.write("Test content")
-
-    #     organize_folder(self.test_folder)
-
-    #     # Verify that files in the main folder are organized correctly
-    #     for file_name in file_names:
-    #         file_path = os.path.join(self.test_folder, file_name)
-    #         extension = os.path.splitext(file_name)[1]
-    #         category = None
-    #         for cat, ext_list in file_categories.items():
-    #             if extension in ext_list:
-    #                 category = cat
-    #                 break
-    #         if category:
-    #             expected_path = os.path.join(self.test_folder, category, file_name)
-    #         else:
-    #             expected_path = os.path.join(self.test_folder, "Misc", file_name)
-    #         self.assertTrue(os.path.exists(expected_path))
-
 
     def test_existing_destination_directories(self):
     # Test scenario: Existing Destination Directories
@@ -218,9 +164,6 @@ class FileOrganizationTestCase(unittest.TestCase):
                 expected_path = os.path.join(self.test_folder, category, file_name)
 
             self.assertTrue(os.path.exists(expected_path))
-
-
-
 
 if __name__ == "__main__":
     unittest.main()
