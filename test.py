@@ -2,7 +2,7 @@ import os
 import shutil
 import time
 import unittest
-from clean import Clean, file_categories, get_downloads_path, organize_folder
+from clean import FileOrganizer, file_categories, get_downloads_path, organize_folder
 
 class FileOrganizationTestCase(unittest.TestCase):
     def setUp(self):
@@ -16,7 +16,7 @@ class FileOrganizationTestCase(unittest.TestCase):
 
     def test_empty_folder(self):
         # Test scenario: Empty Folder
-        clean = Clean(self.test_folder)
+        clean = FileOrganizer(self.test_folder)
         clean.list_files()
         self.assertEqual(len(clean.files), 0)
 
