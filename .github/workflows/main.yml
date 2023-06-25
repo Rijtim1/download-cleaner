@@ -29,9 +29,9 @@ jobs:
         pip install pyinstaller
         pip install -r "requirements.txt"
 
-    # - name: Build EXE
-    #   run: |
-    #     python create-exe.py
+    - name: Build EXE
+      run: |
+        python create-exe.py
 
     - name: Run tests
       run: |
