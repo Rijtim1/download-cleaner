@@ -1,9 +1,5 @@
 import subprocess
 
-# subprocess.call(["pip", "uninstall", "clean"])
-# subprocess.call(["rm", "-rf", "build"])
-# subprocess.call(["rm", "-rf", "dist"])
-# subprocess.call(["rm", "-rf", "clean.spec"])
 subprocess.call(["pip", "install", "--upgrade", "pip"])
 
 # Step 1: Install requirements from requirements.txt
