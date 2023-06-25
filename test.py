@@ -1,8 +1,9 @@
+import unittest
+from clean import FileOrganizer, file_categories, organize_folder
 import os
 import shutil
 import time
-import unittest
-from clean import Clean, file_categories, get_downloads_path, organize_folder
+
 
 class FileOrganizationTestCase(unittest.TestCase):
     def setUp(self):
@@ -16,18 +17,22 @@ class FileOrganizationTestCase(unittest.TestCase):
 
     def test_empty_folder(self):
         # Test scenario: Empty Folder
-        clean = Clean(self.test_folder)
-        clean.list_files()
-        self.assertEqual(len(clean.files), 0)
+        organizer = FileOrganizer(self.test_folder)
 
-        clean.get_file_extension()
-        self.assertEqual(len(clean.extensions), 0)
+        # List files and verify that the list is empty
+        organizer.list_files()
+        self.assertEqual(len(organizer.files), 0)
 
-        clean.setup()
-        clean.move_files()
+        # Get file extensions and verify that the list is empty
+        organizer.get_file_extension()
+        self.assertEqual(len(organizer.extensions), 0)
+
+        # Move files
+        organizer.move_files()
 
         # Verify that no files were moved
         self.assertEqual(len(os.listdir(self.test_folder)), 0)
+
 
     def test_folder_with_files(self):
         # Test scenario: Folder with Files
