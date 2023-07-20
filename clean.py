@@ -87,12 +87,30 @@ def organize_folder(path):
     organizer.organize_files()
 
 
+def get_user_preference():
+    config_file = os.path.expanduser("~/.download_cleaner_config")
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            downloads_path = f.read().strip()
+    else:
+        print("Do you want to auto-detect the downloads folder or specify it?")
+        print("1. Auto-detect")
+        print("2. Specify")
+        choice = input("Enter your choice (1 or 2): ")
+        if choice == '1':
+            downloads_path = os.path.expanduser("~/Downloads")
+        else:
+            downloads_path = input("Enter the path to the downloads folder: ")
+        with open(config_file, 'w') as f:
+            f.write(downloads_path)
+    return downloads_path
+
 def main():
-    downloads_path = os.path.expanduser("~/Downloads")
+    downloads_path = get_user_preference()
     if os.path.exists(downloads_path):
         organize_folder(downloads_path)
     else:
-        print("Downloads folder not found.")
+        print(f"Folder {downloads_path} not found.")
 
 
 if __name__ == "__main__":
