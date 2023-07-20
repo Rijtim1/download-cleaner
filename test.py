@@ -1,5 +1,6 @@
 import unittest
-from clean import FileOrganizer, file_categories, organize_folder
+from unittest.mock import patch
+from clean import FileOrganizer, file_categories, organize_folder, get_user_preference
 import os
 import shutil
 import time
@@ -10,6 +11,11 @@ class FileOrganizationTestCase(unittest.TestCase):
         # Create a temporary test folder for each test case
         self.test_folder = os.path.join(os.getcwd(), "test_folder")
         os.mkdir(self.test_folder)
+
+        # Write the path of the temporary test folder to the configuration file
+        config_file = os.path.expanduser("~/.download_cleaner_config")
+        with open(config_file, 'w') as f:
+            f.write(self.test_folder)
 
     def tearDown(self):
         # Remove the temporary test folder after each test case
@@ -169,6 +175,18 @@ class FileOrganizationTestCase(unittest.TestCase):
                 expected_path = os.path.join(self.test_folder, category, file_name)
 
             self.assertTrue(os.path.exists(expected_path))
+
+    def test_get_user_preference(self):
+        # Test scenario: Get User Preference
+        # Mock user input for the get_user_preference() function
+        with patch('builtins.input', return_value='2'):
+            get_user_preference()
+
+        # Verify that the user's preference is correctly written to the configuration file
+        config_file = os.path.expanduser("~/.download_cleaner_config")
+        with open(config_file, 'r') as f:
+            downloads_path = f.read().strip()
+        self.assertEqual(downloads_path, self.test_folder)
 
 if __name__ == "__main__":
     unittest.main()
