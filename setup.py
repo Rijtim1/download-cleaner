@@ -19,8 +19,7 @@ setup(
     ],
     python_requires='>=3.6',
     install_requires=[
-        "tqdm",
-        "shutil"
+        "tqdm"
     ],
     entry_points={
         'console_scripts': [
