@@ -1,7 +1,6 @@
 import os
 import random
 import string
-import shutil
 from tqdm import tqdm
 
 file_categories = {
