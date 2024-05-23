@@ -26,8 +26,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Build .exe with PyInstaller
-      run: |
-        pyinstaller --onefile clean.py
+      run: pyinstaller --onefile clean.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
@@ -46,14 +45,18 @@ jobs:
         name: clean
         path: .
 
+    - name: Generate tag name
+      id: generate_tag
+      run: echo ::set-output name=tag::v1.0.${{ github.run_number }}
+
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: ${{ steps.generate_tag.outputs.tag }}
+        release_name: Release ${{ steps.generate_tag.outputs.tag }}
         body: |
           Release notes here
         draft: false
