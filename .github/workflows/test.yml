@@ -27,7 +27,7 @@ jobs:
 
     - name: Build .exe with PyInstaller
       run: |
-        pyinstaller --onefile download-cleaner/clean.py
+        pyinstaller --onefile clean.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
