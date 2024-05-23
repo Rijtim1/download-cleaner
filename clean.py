@@ -1,4 +1,3 @@
-__all__ = ['FileOrganizer', 'organize_folder']
 import os
 import shutil
 import tqdm
