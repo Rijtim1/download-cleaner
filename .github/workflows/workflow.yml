@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
@@ -29,7 +29,7 @@ jobs:
       run: pyinstaller --onefile clean.py
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: clean
         path: dist/clean.exe
@@ -40,14 +40,14 @@ jobs:
 
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: clean
         path: .
 
     - name: Generate tag name
       id: generate_tag
-      run: echo ::set-output name=tag::v1.0.${{ github.run_number }}
+      run: echo "TAG=v1.0.${{ github.run_number }}" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       id: create_release
@@ -55,8 +55,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.generate_tag.outputs.tag }}
-        release_name: Release ${{ steps.generate_tag.outputs.tag }}
+        tag_name: ${{ env.TAG }}
+        release_name: Release ${{ env.TAG }}
         body: |
           Release notes here
         draft: false
