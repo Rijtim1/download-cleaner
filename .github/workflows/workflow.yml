@@ -47,7 +47,16 @@ jobs:
 
     - name: Generate tag name
       id: generate_tag
-      run: echo "TAG=v1.0.${{ github.run_number }}" >> $GITHUB_ENV
+      run: echo "tag=v1.0.${{ github.run_number }}" >> $GITHUB_ENV
+
+    - name: Generate release notes
+      id: generate_notes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { execSync } = require('child_process');
+          const commits = execSync('git log --pretty=format:"* %s" -n 10').toString();
+          return commits;
 
     - name: Create GitHub Release
       id: create_release
@@ -55,10 +64,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.TAG }}
-        release_name: Release ${{ env.TAG }}
-        body: |
-          Release notes here
+        tag_name: ${{ env.tag }}
+        release_name: Release ${{ env.tag }}
+        body: ${{ steps.generate_notes.outputs.result }}
         draft: false
         prerelease: false
 
