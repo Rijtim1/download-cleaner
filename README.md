@@ -1,84 +1,183 @@
-# File Organization Script Documentation
+# Download Cleaner
 
+## Overview
 
-The file organization script is a Python script that helps you organize files in a specified folder based on their file extensions. It categorizes files into different directories based on their extensions and moves them accordingly.
+Download Cleaner is a tool designed to automate the cleanup of your Downloads folder. It identifies and removes unnecessary files, ensuring your Downloads folder remains organized and clutter-free. This project includes a GitHub Actions CI/CD pipeline that builds and releases the tool as a standalone executable.
 
-## Prerequisites
+## Features
 
-To run the script, you need the following:
+- **Automated Cleanup:** Automatically cleans up files in the Downloads folder based on predefined criteria.
+- **Standalone Executable:** Built using PyInstaller, the tool is distributed as a standalone executable for ease of use.
+- **Continuous Integration and Deployment:** Utilizes GitHub Actions for automated builds and releases.
 
-- Python 3.x installed on your system
-- The `os` and `shutil` modules, which are part of the Python Standard Library
+## Requirements
+
+- Python 3.9
+- GitHub account with repository access
+- GitHub Actions enabled
+
+## Installation
+
+1. **Clone the Repository:**
+
+   ```bash
+   git clone https://github.com/yourusername/download-cleaner.git
+   cd download-cleaner
+   ```
+
+2. **Install Dependencies:**
+
+   ```bash
+   python -m pip install --upgrade pip
+   pip install pyinstaller
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-1. Save the script code in a Python file (e.g., `file_organization.py`).
-1. Open a terminal or command prompt.
-1. Navigate to the directory where the script file is located.
-1. Run the script using the following command: python file_organization.py.
+1. **Build the Executable:**
 
-## Script Explanation
+   ```bash
+   pyinstaller --onefile clean.py
+   ```
 
-The script consists of the following components:
+2. **Run the Executable:**
+   - Navigate to the `dist` folder where the executable is created.
+   - Run the executable:
 
-1. File Categories: The `file_categories` dictionary defines different categories of files based on their extensions. Each category is associated with a list of file extensions. You can modify this dictionary according to your preferences.
+     ```bash
+     ./clean.exe
+     ```
 
-1. `Clean Class`: The Clean class encapsulates the file organization process.
+## CI/CD Pipeline
 
-    - `__init__(self, path)`: Initializes the `Clean` object with the specified `path` parameter, representing the folder path to organize.
+The project uses GitHub Actions for continuous integration and deployment. The workflow is triggered on pushes to the `master` branch and performs the following steps:
 
-    - `list_files(self)`: Retrieves all the `files` in the specified folder and stores them in the files attribute.
+1. **Build Job:**
+   - Checks out the code.
+   - Sets up Python 3.9.
+   - Installs dependencies.
+   - Builds the executable using PyInstaller.
+   - Uploads the executable as an artifact.
 
-    - `get_file_extension(self)`: Extracts the unique file extensions from the `files` list and stores them in the extensions attribute.
+2. **Release Job:**
+   - Downloads the artifact from the build job.
+   - Generates a version tag.
+   - Generates release notes based on the latest commit messages.
+   - Creates a GitHub release.
+   - Uploads the executable to the release.
 
-    - `setup(self)`: Creates the necessary directories for each file category and extension.
+## GitHub Actions Workflow
 
-    - `move_files(self)`: Moves the files to their respective directories based on their extensions and categories. Duplicate files are handled by appending a count number to the file name.
+```yaml
+name: Build and Release
 
-1. `get_downloads_path()`: Returns the path to the user's downloads folder. This function is used to get the default folder to organize.
+on:
+  push:
+    branches:
+      - master
 
-1. `organize_folder(path)`: Performs the file organization process for the specified `path` folder. It creates an instance of the `Clean` class and calls the necessary methods to organize the files.
+jobs:
+  build:
+    runs-on: windows-latest
 
-1. `main()`: The main function of the script. It retrieves the downloads folder path and calls the `organize_folder` function to organize the files in the downloads folder.
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v3
 
-1. Execution: The script checks if the downloads folder exists and executes the `main` function if it does.
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-## Customization
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-To customize the file categories or add new ones, you can modify the `file_categories` dictionary in the script. You can define your own categories and associate them with specific file extensions.
+    - name: Build .exe with PyInstaller
+      run: pyinstaller --onefile clean.py
 
-For example, if you want to add a new category called "Scripts" for JavaScript files, you can modify the `file_categories` dictionary as follows:
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: clean
+        path: dist/clean.exe
 
-``
-file_categories = {
-    # ...
-    'Scripts': ['.py', '.sh', '.js', '.php', '.pl'],
-    # ...
-}
-``
+  release:
+    needs: build
+    runs-on: ubuntu-latest
 
-Make sure to include the leading dot (e.g., .js) for each file extension.
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v3
 
-## Limitations
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: clean
+        path: .
 
-- The script organizes files only within a single folder. It does not traverse subdirectories.
+    - name: Generate tag name
+      id: generate_tag
+      run: echo "tag=v1.0.${{ github.run_number }}" >> $GITHUB_ENV
 
-- The script moves files based on their extensions and categories. If you have files without recognized extensions or categories, they will be moved to the "Misc" directory.
+    - name: Generate release notes
+      id: generate_notes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { execSync } = require('child_process');
+          const commits = execSync('git log --pretty=format:"* %s" -n 10').toString();
+          return commits;
 
-## Example Output
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.tag }}
+        release_name: Release ${{ env.tag }}
+        body: ${{ steps.generate_notes.outputs.result }}
+        draft: false
+        prerelease: false
 
-Here's an example output of the script:
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./clean.exe
+        asset_name: clean.exe
+        asset_content_type: application/octet-stream
+```
 
-``
-Organizing folder at C:\Users\Username\Downloads
-Setting up directories: 100%|███████████████████████████████████████████████████| 15/15 [00:00<00:00, 1923.08it/s]
-Moving files: 100%|████████████████████████████████████████████████████████████████| 20/20 [00:00<00:00, 1111.11it/s]
-Total time taken: 0.04 seconds
-Total files moved: 20
-``
+## Contributing
 
-The output shows the progress of setting up directories and moving files, along with the total time taken and the number of files moved.
+We welcome contributions! Please fork the repository and submit pull requests.
 
-## Summary
+### Steps to Contribute
 
-The file organization script is a handy tool to automatically organize files in a folder based on their extensions. It provides a convenient way to keep your files organized and easily accessible. By using predefined categories, the script ensures that files are placed in appropriate directories.
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`.
+3. Make your changes and commit them: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature/your-feature-name`.
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+## Contact
+
+For any questions or suggestions, feel free to open an issue or contact the project maintainer.
+
+Enjoy your clean and organized Downloads folder!
+
+---
+
+By following this README, you should be able to set up, build, and use the Download Cleaner tool with ease. The CI/CD pipeline will ensure that any changes are automatically built and released, keeping the process smooth and efficient.
