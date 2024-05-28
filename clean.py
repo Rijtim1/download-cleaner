@@ -2,7 +2,6 @@ import os
 import shutil
 import tqdm
 
-
 # Dictionary defining file categories and their associated extensions
 file_categories = {
     'Documents': ['.doc', '.docx', '.pdf', '.txt', '.rtf', '.odt'],
@@ -21,7 +20,6 @@ file_categories = {
     'Misc': []
 }
 
-
 class FileOrganizer:
     def __init__(self, path):
         self.path = path
@@ -35,14 +33,13 @@ class FileOrganizer:
 
     def create_directories(self):
         for extension in self.extensions:
-            for category, extensions in file_categories.items():
-                if extension in extensions:
-                    category_dir = os.path.join(self.path, category)
-                    if not os.path.exists(category_dir):
-                        os.mkdir(category_dir)
-                    extension_dir = os.path.join(category_dir, extension)
-                    if not os.path.exists(extension_dir):
-                        os.mkdir(extension_dir)
+            category = self.get_category(extension)
+            category_dir = os.path.join(self.path, category)
+            if not os.path.exists(category_dir):
+                os.mkdir(category_dir)
+            extension_dir = os.path.join(category_dir, extension)
+            if not os.path.exists(extension_dir):
+                os.mkdir(extension_dir)
 
     def move_files(self):
         for file in tqdm.tqdm(self.files, desc="Moving files"):
@@ -52,13 +49,10 @@ class FileOrganizer:
             extension_dir = os.path.join(category_dir, extension)
             dest_file = self.get_unique_filename(file, extension_dir)
 
-            if not os.path.exists(category_dir):
-                os.mkdir(category_dir)
-
-            if not os.path.exists(extension_dir):
-                os.mkdir(extension_dir)
-
-            shutil.move(os.path.join(self.path, file), dest_file)
+            try:
+                shutil.move(os.path.join(self.path, file), dest_file)
+            except Exception as e:
+                print(f"Error moving file {file}: {e}")
 
     def get_category(self, extension):
         for category, extensions in file_categories.items():
@@ -80,12 +74,10 @@ class FileOrganizer:
         self.create_directories()
         self.move_files()
 
-
 def organize_folder(path):
     print(f"Organizing folder at {path}")
     organizer = FileOrganizer(path)
     organizer.organize_files()
-
 
 def get_user_preference():
     config_file = os.path.expanduser("~/.download_cleaner_config")
@@ -112,7 +104,5 @@ def main():
     else:
         print(f"Folder {downloads_path} not found.")
 
-
 if __name__ == "__main__":
     main()
-    # test
