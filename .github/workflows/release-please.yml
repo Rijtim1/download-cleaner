@@ -11,6 +11,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Release Please
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           release-type: simple
+      - name: Upload clean.py to Release
+        if: ${{ steps.release.outputs.release_created }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: clean.py
