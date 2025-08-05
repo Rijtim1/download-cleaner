@@ -7,6 +7,9 @@ on:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # required to create releases/tags
+      pull-requests: write # required to comment on PRs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
